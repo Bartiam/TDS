@@ -50,20 +50,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	FCharacterSpeed movementInfo;
 
-	// Function for movement character
+	// Functions for movement character
 	UFUNCTION()
 	void InputAxisX(float value);
 	UFUNCTION()
 	void InputAxisY(float value);
 	UFUNCTION()
 	void MovementTick(float value);
-	//////////////////////////////////
+	///////////////////////////////////
 
-	// 
+	// Changes the current state of the character
 	UFUNCTION(BlueprintCallable)
 	void CharacterUpdate();
 	UFUNCTION(BlueprintCallable)
 	void ChangeMovementState(EMovementState movementState);
-	/////////////////////////////////
+	/////////////////////////////////////////////
 };
 

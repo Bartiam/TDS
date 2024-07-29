@@ -100,6 +100,7 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 	newInputComponent->BindAxis(TEXT("MoveRight"), this, &ATDSCharacter::InputAxisY);
 }
 
+// Function for movement character
 void ATDSCharacter::InputAxisX(float value)
 {
 	AddMovementInput(FVector(1.0f, 0.0f, 0.f), value);
@@ -125,17 +126,19 @@ void ATDSCharacter::MovementTick(float value)
 	auto newActorRotationYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), resultHit.Location).Yaw;
 	SetActorRotation(FRotator(0.f, newActorRotationYaw, 0.f));
 }
+///////////////////////////////////
 
+// Changes the current state of the character
 void ATDSCharacter::CharacterUpdate()
 {
 	float resultSpeed = 600.f;
 	switch (currentStateOfMove)
 	{
-	case EMovementState::AIM_STATE:
-		resultSpeed = movementInfo.aimSpeed;
+	case EMovementState::AIM_WALK_STATE:
+		resultSpeed = movementInfo.aimWalkSpeed;
 		break;
 	case EMovementState::WALK_STATE:
-		resultSpeed = movementInfo.walkSpeed;
+		resultSpeed = movementInfo.simpleWalkSpeed;
 		break;
 	case EMovementState::RUN_STATE:
 		resultSpeed = movementInfo.runSpeed;
@@ -150,3 +153,4 @@ void ATDSCharacter::ChangeMovementState(EMovementState movementState)
 	currentStateOfMove = movementState;
 	CharacterUpdate();
 }
+/////////////////////////////////////////////

@@ -170,13 +170,13 @@ void ATDSCharacter::MouseWheelCameraSlide(const float value)
 	if (value < 0.f && (springArmLength + changeDistanceSpringArm <= maxCameraHeight) && bIsSlideDone)
 	{
 		GetWorldTimerManager().SetTimer(timerToSmooth, this, &ATDSCharacter::AddsSmoothnessToTheCamera, 0.001, true);
-		bIsSlideUp = true;
+		isSlideUp = 1;
 		bIsSlideDone = false;
 	}
 	else if (value > 0.f && (springArmLength - changeDistanceSpringArm >= minCameraHeight) && bIsSlideDone)
 	{
 		GetWorldTimerManager().SetTimer(timerToSmooth, this, &ATDSCharacter::AddsSmoothnessToTheCamera, 0.001, true);
-		bIsSlideUp = false;
+		isSlideUp = -1;
 		bIsSlideDone = false;
 	}
 }
@@ -184,18 +184,9 @@ void ATDSCharacter::MouseWheelCameraSlide(const float value)
 void ATDSCharacter::AddsSmoothnessToTheCamera()
 {
 	float changeSlideStepDistance = 1.f;
-
 	currentSlideDistance += changeSlideStepDistance;
 
-	if (bIsSlideUp)
-	{
-		CameraBoom->TargetArmLength += changeSlideStepDistance;
-	}
-	else
-	{
-		CameraBoom->TargetArmLength += (changeSlideStepDistance * (-1));
-	}
-
+	CameraBoom->TargetArmLength += isSlideUp;
 	if (currentSlideDistance >= changeDistanceSpringArm)
 	{
 		bIsSlideDone = true;

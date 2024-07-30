@@ -85,7 +85,7 @@ private:
 		UPROPERTY()
 		bool bIsSlideDone = true;
 		UPROPERTY()
-		bool bIsSlideUp;
+		int isSlideUp;
 		UPROPERTY()
 		float currentSlideDistance = 0.f;
 		UPROPERTY()

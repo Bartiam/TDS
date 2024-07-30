@@ -155,9 +155,23 @@ void ATDSCharacter::CharacterUpdate()
 	GetCharacterMovement()->MaxWalkSpeed = resultSpeed;
 }
 
-void ATDSCharacter::ChangeMovementState(EMovementState movementState)
+void ATDSCharacter::ChangeMovementState()
 {
-	currentStateOfMove = movementState;
+	if (bIsFastRunning)
+	{
+		bIsWalking = false;
+		bIsAiming = false;
+		currentStateOfMove = EMovementState::FAST_RUN_STATE;
+	}
+	else if (bIsWalking && bIsAiming)
+		currentStateOfMove = EMovementState::AIM_WALK_STATE;
+	else if (!bIsWalking && bIsAiming)
+		currentStateOfMove = EMovementState::AIM_RUN_STATE;
+	else if (bIsWalking && !bIsAiming)
+		currentStateOfMove = EMovementState::WALK_STATE;
+	else
+		currentStateOfMove = EMovementState::RUN_STATE;
+
 	CharacterUpdate();
 }
 /////////////////////////////////////////////

@@ -53,7 +53,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	FCharacterSpeed movementSpeedInfo;
 	///////////////////////////////////////
-
+	
 	// Variables for zoom
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
 	float minCameraHeight = 700.f;
@@ -62,6 +62,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
 	float changeDistanceSpringArm = 100.f;
 	/////////////////////
+
+	// Variables for character movement
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	bool bIsWalking = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	bool bIsFastRunning = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	bool bIsAiming = false;
+	///////////////////////////////////
 
 private:
 	// Functions for movement character
@@ -76,8 +85,9 @@ private:
 	// Changes the current state of the character
 	UFUNCTION(BlueprintCallable)
 	void CharacterUpdate();
+
 	UFUNCTION(BlueprintCallable)
-	void ChangeMovementState(EMovementState movementState);
+	void ChangeMovementState();
 	/////////////////////////////////////////////
 
 	// Zooming in and out of the camera by the teddy bear wheel

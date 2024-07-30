@@ -47,16 +47,30 @@ public:
 	// Current state of character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	EMovementState currentStateOfMove = EMovementState::RUN_STATE;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	FCharacterSpeed movementInfo;
+	/////////////////////////////
 
+	// Struct info about speed of character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	FCharacterSpeed movementSpeedInfo;
+	///////////////////////////////////////
+
+	// Variables for zoom
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
+	float minCameraHeight = 700.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
+	float maxCameraHeight = 1200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
+	float changeDistanceSpringArm = 100.f;
+	/////////////////////
+
+private:
 	// Functions for movement character
 	UFUNCTION()
-	void InputAxisX(float value);
+	void InputAxisX(const float value);
 	UFUNCTION()
-	void InputAxisY(float value);
+	void InputAxisY(const float value);
 	UFUNCTION()
-	void MovementTick(float value);
+	void MovementTick(const float value);
 	///////////////////////////////////
 
 	// Changes the current state of the character
@@ -65,5 +79,24 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeMovementState(EMovementState movementState);
 	/////////////////////////////////////////////
+
+	// Zooming in and out of the camera by the teddy bear wheel
+		// Variables for smooth slide
+		UPROPERTY()
+		bool bIsSlideDone = true;
+		UPROPERTY()
+		bool bIsSlideUp;
+		UPROPERTY()
+		float currentSlideDistance = 0.f;
+		UPROPERTY()
+		FTimerHandle timerToSmooth;
+		/////////////////////////////
+
+	UFUNCTION()
+	void MouseWheelCameraSlide(const float value);
+
+	UFUNCTION()
+	void AddsSmoothnessToTheCamera();
+	//////////////////////////////////////////////////////////
 };
 

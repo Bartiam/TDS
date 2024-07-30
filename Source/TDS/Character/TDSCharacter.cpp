@@ -98,22 +98,23 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 
 	newInputComponent->BindAxis(TEXT("MoveForward"), this, &ATDSCharacter::InputAxisX);
 	newInputComponent->BindAxis(TEXT("MoveRight"), this, &ATDSCharacter::InputAxisY);
+	newInputComponent->BindAxis(TEXT("MouseWheel"), this, &ATDSCharacter::MouseWheelCameraSlide);
 }
 
 // Function for movement character
-void ATDSCharacter::InputAxisX(float value)
+void ATDSCharacter::InputAxisX(const float value)
 {
 	AddMovementInput(FVector(1.0f, 0.0f, 0.f), value);
 	MovementTick(value);
 }
 
-void ATDSCharacter::InputAxisY(float value)
+void ATDSCharacter::InputAxisY(const float value)
 {
 	AddMovementInput(FVector(0.0f, 1.0f, 0.f), value);
 	MovementTick(value);
 }
 
-void ATDSCharacter::MovementTick(float value)
+void ATDSCharacter::MovementTick(const float value)
 {
 	auto myPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -131,17 +132,23 @@ void ATDSCharacter::MovementTick(float value)
 // Changes the current state of the character
 void ATDSCharacter::CharacterUpdate()
 {
-	float resultSpeed = 600.f;
+	float resultSpeed;
 	switch (currentStateOfMove)
 	{
 	case EMovementState::AIM_WALK_STATE:
-		resultSpeed = movementInfo.aimWalkSpeed;
+		resultSpeed = movementSpeedInfo.aimWalkSpeed;
 		break;
 	case EMovementState::WALK_STATE:
-		resultSpeed = movementInfo.simpleWalkSpeed;
+		resultSpeed = movementSpeedInfo.simpleWalkSpeed;
+		break;
+	case EMovementState::AIM_RUN_STATE:
+		resultSpeed = movementSpeedInfo.aimRunSpeed;
 		break;
 	case EMovementState::RUN_STATE:
-		resultSpeed = movementInfo.runSpeed;
+		resultSpeed = movementSpeedInfo.runSpeed;
+		break;
+	case EMovementState::FAST_RUN_STATE:
+		resultSpeed = movementSpeedInfo.fastRunSpeed;
 		break;
 	}
 
@@ -154,3 +161,47 @@ void ATDSCharacter::ChangeMovementState(EMovementState movementState)
 	CharacterUpdate();
 }
 /////////////////////////////////////////////
+
+// Zooming in and out of the camera by the teddy bear wheel
+void ATDSCharacter::MouseWheelCameraSlide(const float value)
+{
+	float springArmLength = CameraBoom->TargetArmLength;
+
+	if (value < 0.f && (springArmLength + changeDistanceSpringArm <= maxCameraHeight) && bIsSlideDone)
+	{
+		GetWorldTimerManager().SetTimer(timerToSmooth, this, &ATDSCharacter::AddsSmoothnessToTheCamera, 0.001, true);
+		bIsSlideUp = true;
+		bIsSlideDone = false;
+	}
+	else if (value > 0.f && (springArmLength - changeDistanceSpringArm >= minCameraHeight) && bIsSlideDone)
+	{
+		GetWorldTimerManager().SetTimer(timerToSmooth, this, &ATDSCharacter::AddsSmoothnessToTheCamera, 0.001, true);
+		bIsSlideUp = false;
+		bIsSlideDone = false;
+	}
+}
+
+void ATDSCharacter::AddsSmoothnessToTheCamera()
+{
+	float changeSlideStepDistance = 1.f;
+
+	currentSlideDistance += changeSlideStepDistance;
+
+	if (bIsSlideUp)
+	{
+		CameraBoom->TargetArmLength += changeSlideStepDistance;
+	}
+	else
+	{
+		CameraBoom->TargetArmLength += (changeSlideStepDistance * (-1));
+	}
+
+	if (currentSlideDistance >= changeDistanceSpringArm)
+	{
+		bIsSlideDone = true;
+		currentSlideDistance = 0.f;
+		GetWorldTimerManager().ClearTimer(timerToSmooth);
+	}
+
+}
+////////////////////////////////////////////////////////////

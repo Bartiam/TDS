@@ -38,6 +38,7 @@ ATDSCharacter::ATDSCharacter()
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	CameraBoom->bUsePawnControlRotation = false;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -90,6 +91,8 @@ void ATDSCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
+
+	MovementTick();
 }
 
 void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent)
@@ -103,18 +106,12 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 
 // Function for movement character
 void ATDSCharacter::InputAxisX(const float value)
-{
-	AddMovementInput(FVector(1.0f, 0.0f, 0.f), value);
-	MovementTick(value);
-}
+{ axisX = value; }
 
 void ATDSCharacter::InputAxisY(const float value)
-{
-	AddMovementInput(FVector(0.0f, 1.0f, 0.f), value);
-	MovementTick(value);
-}
+{ axisY = value; }
 
-void ATDSCharacter::MovementTick(const float value)
+void ATDSCharacter::MovementTick()
 {
 	auto myPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -123,6 +120,21 @@ void ATDSCharacter::MovementTick(const float value)
 
 	FHitResult resultHit;
 	myPlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery6, false, resultHit);
+
+	if (CursorToWorld != nullptr)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			AddMovementInput(FVector(1.f, 0.f, 0.f), axisX);
+			AddMovementInput(FVector(0.f, 1.f, 0.f), axisY);
+			FHitResult traceHitResult;
+			PC->GetHitResultUnderCursor(ECC_Visibility, true, traceHitResult);
+			FVector cursorFV = traceHitResult.ImpactNormal;
+			FRotator cursorR = cursorFV.Rotation();
+			CursorToWorld->SetWorldLocation(traceHitResult.Location);
+			CursorToWorld->SetWorldRotation(cursorR);
+		}
+	}
 
 	auto newActorRotationYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), resultHit.Location).Yaw;
 	SetActorRotation(FRotator(0.f, newActorRotationYaw, 0.f));

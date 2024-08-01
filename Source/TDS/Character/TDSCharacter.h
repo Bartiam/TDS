@@ -63,13 +63,16 @@ public:
 	float changeDistanceSpringArm = 100.f;
 	/////////////////////
 
-	// Variables for character movement
+	// Variables for movement character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bIsWalking = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bIsFastRunning = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bIsAiming = false;
+
+	float axisX = 0.f;
+	float axisY = 0.f;
 	///////////////////////////////////
 
 private:
@@ -79,7 +82,7 @@ private:
 	UFUNCTION()
 	void InputAxisY(const float value);
 	UFUNCTION()
-	void MovementTick(const float value);
+	void MovementTick();
 	///////////////////////////////////
 
 	// Changes the current state of the character

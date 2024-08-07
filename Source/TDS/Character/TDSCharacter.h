@@ -85,13 +85,22 @@ private:
 	void MovementTick();
 	///////////////////////////////////
 
-	// Changes the current state of the character
+	// ====================== Changes the current state of the character
 	UFUNCTION(BlueprintCallable)
-	void CharacterUpdate();
+	void CharacterUpdateSpeed();
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeMovementState();
-	/////////////////////////////////////////////
+	UFUNCTION()
+	void AccelerationAndDeccelerationToMove();
+		// ============ Variables for change movement
+		UPROPERTY()
+		float currentSpeed;
+		UPROPERTY()
+		FTimerHandle timerToAccelirationSpeed;
+		// =========================================
+
+	// ===================================================================
 
 	// Zooming in and out of the camera by the teddy bear wheel
 		// Variables for smooth slide
@@ -110,6 +119,6 @@ private:
 
 	UFUNCTION()
 	void AddsSmoothnessToTheCamera();
-	//////////////////////////////////////////////////////////
+	// =============================================================
 };
 

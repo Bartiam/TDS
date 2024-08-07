@@ -59,6 +59,10 @@ ATDSCharacter::ATDSCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	// Setting the default speed settings
+	currentSpeed = movementSpeedInfo.runSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = currentSpeed;
 }
 
 void ATDSCharacter::Tick(float DeltaSeconds)
@@ -104,7 +108,7 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 	newInputComponent->BindAxis(TEXT("MouseWheel"), this, &ATDSCharacter::MouseWheelCameraSlide);
 }
 
-// Function for movement character
+// ======================================================> Functions for movement character
 void ATDSCharacter::InputAxisX(const float value)
 { axisX = value; }
 
@@ -139,32 +143,33 @@ void ATDSCharacter::MovementTick()
 	auto newActorRotationYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), resultHit.Location).Yaw;
 	SetActorRotation(FRotator(0.f, newActorRotationYaw, 0.f));
 }
-///////////////////////////////////
+// ========================================================================================
 
-// Changes the current state of the character
-void ATDSCharacter::CharacterUpdate()
+// ================================================> Changes the current state of the character
+void ATDSCharacter::CharacterUpdateSpeed()
 {
-	float resultSpeed;
+	GetWorldTimerManager().ClearTimer(timerToAccelirationSpeed);
+
 	switch (currentStateOfMove)
 	{
 	case EMovementState::AIM_WALK_STATE:
-		resultSpeed = movementSpeedInfo.aimWalkSpeed;
+		currentSpeed = movementSpeedInfo.aimWalkSpeed;
 		break;
 	case EMovementState::WALK_STATE:
-		resultSpeed = movementSpeedInfo.simpleWalkSpeed;
+		currentSpeed = movementSpeedInfo.simpleWalkSpeed;
 		break;
 	case EMovementState::AIM_RUN_STATE:
-		resultSpeed = movementSpeedInfo.aimRunSpeed;
+		currentSpeed = movementSpeedInfo.aimRunSpeed;
 		break;
 	case EMovementState::RUN_STATE:
-		resultSpeed = movementSpeedInfo.runSpeed;
+		currentSpeed = movementSpeedInfo.runSpeed;
 		break;
 	case EMovementState::FAST_RUN_STATE:
-		resultSpeed = movementSpeedInfo.fastRunSpeed;
+		currentSpeed = movementSpeedInfo.fastRunSpeed;
 		break;
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = resultSpeed;
+	GetWorldTimerManager().SetTimer(timerToAccelirationSpeed, this, &ATDSCharacter::AccelerationAndDeccelerationToMove, 0.002f, true);
 }
 
 void ATDSCharacter::ChangeMovementState()
@@ -184,11 +189,22 @@ void ATDSCharacter::ChangeMovementState()
 	else
 		currentStateOfMove = EMovementState::RUN_STATE;
 
-	CharacterUpdate();
+	CharacterUpdateSpeed();
 }
-/////////////////////////////////////////////
 
-// Zooming in and out of the camera by the teddy bear wheel
+void ATDSCharacter::AccelerationAndDeccelerationToMove()
+{
+	if (GetCharacterMovement()->MaxWalkSpeed < currentSpeed)
+		GetCharacterMovement()->MaxWalkSpeed += movementSpeedInfo.acceleration;
+	else if (GetCharacterMovement()->MaxWalkSpeed > currentSpeed)
+		GetCharacterMovement()->MaxWalkSpeed -= movementSpeedInfo.acceleration;
+	else
+		GetWorldTimerManager().ClearTimer(timerToAccelirationSpeed);
+}
+
+// ==========================================================================================
+
+// ============================================> Zooming in and out of the camera by the teddy bear wheel
 void ATDSCharacter::MouseWheelCameraSlide(const float value)
 {
 	float springArmLength = CameraBoom->TargetArmLength;
@@ -221,4 +237,4 @@ void ATDSCharacter::AddsSmoothnessToTheCamera()
 	}
 
 }
-////////////////////////////////////////////////////////////
+// ===============================================================================================

@@ -44,26 +44,26 @@ private:
 
 public:
 
-	// Current state of character
+	// =============== Current state of character =======================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	EMovementState currentStateOfMove = EMovementState::RUN_STATE;
-	/////////////////////////////
 
-	// Struct info about speed of character
+
+	// ============== Struct info about speed of character ==============
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	FCharacterSpeed movementSpeedInfo;
-	///////////////////////////////////////
+
 	
-	// Variables for zoom
+	// ======================= Variables for zoom =======================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
 	float minCameraHeight = 700.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
 	float maxCameraHeight = 1200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Zoom")
 	float changeDistanceSpringArm = 100.f;
-	/////////////////////
 
-	// Variables for movement character
+
+	// ================ Variables for movement character ================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bIsWalking = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -73,19 +73,26 @@ public:
 
 	float axisX = 0.f;
 	float axisY = 0.f;
-	///////////////////////////////////
+
+
+	// ===================== Variables for stamina ======================
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stamina")
+	float decreaseStamina = 1.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stamina")
+	float increaseStamina = 1.f;
+
 
 private:
-	// Functions for movement character
+	// ================ Functions for movement character ================
 	UFUNCTION()
 	void InputAxisX(const float value);
 	UFUNCTION()
 	void InputAxisY(const float value);
 	UFUNCTION()
-	void MovementTick();
-	///////////////////////////////////
+	void MovementTick(const float deltaTime);
 
-	// ====================== Changes the current state of the character
+
+	// =========== Changes the current state of the character ============
 	UFUNCTION(BlueprintCallable)
 	void CharacterUpdateSpeed();
 
@@ -98,9 +105,7 @@ private:
 		float currentSpeed;
 		UPROPERTY()
 		FTimerHandle timerToAccelirationSpeed;
-		// =========================================
 
-	// ===================================================================
 
 	// Zooming in and out of the camera by the teddy bear wheel
 		// Variables for smooth slide
@@ -112,13 +117,37 @@ private:
 		float currentSlideDistance = 0.f;
 		UPROPERTY()
 		FTimerHandle timerToSmooth;
-		/////////////////////////////
+
 
 	UFUNCTION()
 	void MouseWheelCameraSlide(const float value);
 
 	UFUNCTION()
 	void AddsSmoothnessToTheCamera();
-	// =============================================================
+
+
+	// ============================= STAMINA ================================
+		// Variables for stamina
+		const float maxStamina = 100.f;
+		UPROPERTY()
+		float currentStamina = 0.f;
+		UPROPERTY()
+		float numberWhichStaminaChanges;
+		UPROPERTY()
+		FTimerHandle timerToAugmentStamina;
+		UPROPERTY()
+		bool bIsCanIncreaseStamina = false;
+
+	UFUNCTION()
+	void ReducesStamina();
+	UFUNCTION()
+	void AugmentStamina();
+	UFUNCTION()
+	void ChangeCanIncreaseStamina();
+
+public: // ===================== Getters and setters ========================
+
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentStamina() const;
 };
 

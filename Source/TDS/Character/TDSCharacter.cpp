@@ -63,6 +63,7 @@ ATDSCharacter::ATDSCharacter()
 	// Setting the default speed settings
 	currentSpeed = movementSpeedInfo.runSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = currentSpeed;
+	currentStamina = maxStamina;
 }
 
 void ATDSCharacter::Tick(float DeltaSeconds)
@@ -96,7 +97,7 @@ void ATDSCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
-	MovementTick();
+	MovementTick(DeltaSeconds);
 }
 
 void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent)
@@ -108,14 +109,14 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 	newInputComponent->BindAxis(TEXT("MouseWheel"), this, &ATDSCharacter::MouseWheelCameraSlide);
 }
 
-// ======================================================> Functions for movement character
+// ================================ Functions for movement character ================================
 void ATDSCharacter::InputAxisX(const float value)
 { axisX = value; }
 
 void ATDSCharacter::InputAxisY(const float value)
 { axisY = value; }
 
-void ATDSCharacter::MovementTick()
+void ATDSCharacter::MovementTick(const float deltaTime)
 {
 	auto myPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -142,10 +143,22 @@ void ATDSCharacter::MovementTick()
 
 	auto newActorRotationYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), resultHit.Location).Yaw;
 	SetActorRotation(FRotator(0.f, newActorRotationYaw, 0.f));
-}
-// ========================================================================================
 
-// ================================================> Changes the current state of the character
+	if (bIsFastRunning)
+	{
+		numberWhichStaminaChanges = (decreaseStamina * deltaTime);
+		ReducesStamina();
+	}
+	else if (bIsCanIncreaseStamina)
+	{
+		numberWhichStaminaChanges = (increaseStamina * deltaTime);
+		AugmentStamina();
+	}
+}
+
+
+
+// ============================ Changes the current state of the character ============================
 void ATDSCharacter::CharacterUpdateSpeed()
 {
 	GetWorldTimerManager().ClearTimer(timerToAccelirationSpeed);
@@ -202,9 +215,9 @@ void ATDSCharacter::AccelerationAndDeccelerationToMove()
 		GetWorldTimerManager().ClearTimer(timerToAccelirationSpeed);
 }
 
-// ==========================================================================================
 
-// ============================================> Zooming in and out of the camera by the teddy bear wheel
+
+// ===================== Zooming in and out of the camera by the teddy bear wheel =====================
 void ATDSCharacter::MouseWheelCameraSlide(const float value)
 {
 	float springArmLength = CameraBoom->TargetArmLength;
@@ -237,4 +250,41 @@ void ATDSCharacter::AddsSmoothnessToTheCamera()
 	}
 
 }
-// ===============================================================================================
+
+
+
+// ============================================= STAMINA ==============================================
+void ATDSCharacter::ReducesStamina()
+{
+	currentStamina -= numberWhichStaminaChanges;
+	bIsCanIncreaseStamina = false;
+	GetWorldTimerManager().ClearTimer(timerToAugmentStamina);
+
+	if (currentStamina <= 0.f)
+	{
+		currentStamina = 0.f;
+		GetWorldTimerManager().SetTimer(timerToAugmentStamina, this, &ATDSCharacter::ChangeCanIncreaseStamina, 3.f, false);
+	}
+	else
+		GetWorldTimerManager().SetTimer(timerToAugmentStamina, this, &ATDSCharacter::ChangeCanIncreaseStamina, 1.f, false);
+}
+
+void ATDSCharacter::AugmentStamina()
+{
+	currentStamina += numberWhichStaminaChanges;
+
+	if (currentStamina >= maxStamina)
+	{
+		currentStamina = maxStamina;
+		bIsCanIncreaseStamina = false;
+	}
+}
+
+void ATDSCharacter::ChangeCanIncreaseStamina()
+{ bIsCanIncreaseStamina = true; }
+
+
+
+// ===================================== Getters and setters ==========================================
+float ATDSCharacter::GetCurrentStamina() const
+{ return currentStamina; }

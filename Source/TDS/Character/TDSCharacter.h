@@ -80,6 +80,10 @@ public:
 	float decreaseStamina = 1.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stamina")
 	float increaseStamina = 1.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stamina")
+	float recoveryFromTired = 40.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina")
+	bool bIsCharacterTired = false;
 
 
 private:
@@ -137,6 +141,8 @@ private:
 		FTimerHandle timerToAugmentStamina;
 		UPROPERTY()
 		bool bIsCanIncreaseStamina = false;
+		UPROPERTY()
+		bool bIsStartsTimerToIncreaseStamina = false;
 
 	UFUNCTION()
 	void ReducesStamina();

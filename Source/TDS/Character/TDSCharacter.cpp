@@ -141,15 +141,18 @@ void ATDSCharacter::MovementTick(const float deltaTime)
 		}
 	}
 
-	auto newActorRotationYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), resultHit.Location).Yaw;
-	SetActorRotation(FRotator(0.f, newActorRotationYaw, 0.f));
-
 	if (bIsFastRunning)
 	{
 		numberWhichStaminaChanges = (decreaseStamina * deltaTime);
 		ReducesStamina();
 	}
-	else if (bIsCanIncreaseStamina)
+	else
+	{
+		auto newActorRotationYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), resultHit.Location).Yaw;
+		SetActorRotation(FRotator(0.f, newActorRotationYaw, 0.f));
+	}
+
+	if (bIsCanIncreaseStamina)
 	{
 		numberWhichStaminaChanges = (increaseStamina * deltaTime);
 		AugmentStamina();
@@ -256,22 +259,52 @@ void ATDSCharacter::AddsSmoothnessToTheCamera()
 // ============================================= STAMINA ==============================================
 void ATDSCharacter::ReducesStamina()
 {
-	currentStamina -= numberWhichStaminaChanges;
-	bIsCanIncreaseStamina = false;
-	GetWorldTimerManager().ClearTimer(timerToAugmentStamina);
-
-	if (currentStamina <= 0.f)
+	if (!GetVelocity().IsZero())
 	{
-		currentStamina = 0.f;
-		GetWorldTimerManager().SetTimer(timerToAugmentStamina, this, &ATDSCharacter::ChangeCanIncreaseStamina, 3.f, false);
+		bIsCanIncreaseStamina = false;
+		bIsStartsTimerToIncreaseStamina = false;
+		currentStamina -= numberWhichStaminaChanges;
 	}
-	else
-		GetWorldTimerManager().SetTimer(timerToAugmentStamina, this, &ATDSCharacter::ChangeCanIncreaseStamina, 1.f, false);
+
+	if (!bIsStartsTimerToIncreaseStamina)
+	{
+		GetWorldTimerManager().ClearTimer(timerToAugmentStamina);
+
+		if (currentStamina <= 0.f)
+		{
+			currentStamina = 0.f;
+
+			bIsFastRunning = false;
+			bIsCharacterTired = true;
+			ChangeMovementState();
+
+			GetWorldTimerManager().SetTimer(timerToAugmentStamina, this, &ATDSCharacter::ChangeCanIncreaseStamina, 2.f, false);
+			return;
+		}
+
+		GetWorldTimerManager().SetTimer(timerToAugmentStamina, this, &ATDSCharacter::ChangeCanIncreaseStamina, 0.5f, false);
+
+		bIsStartsTimerToIncreaseStamina = true;
+	}
 }
 
 void ATDSCharacter::AugmentStamina()
 {
 	currentStamina += numberWhichStaminaChanges;
+
+	if (currentStamina >= recoveryFromTired)
+	{
+		bIsCharacterTired = false;
+
+		auto myPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		FKey shiftKey = EKeys::LeftShift;
+
+		if (myPlayerController->IsInputKeyDown(shiftKey))
+		{
+			bIsFastRunning = true;
+			ChangeMovementState();
+		}
+	}
 
 	if (currentStamina >= maxStamina)
 	{

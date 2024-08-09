@@ -21,21 +21,23 @@ struct FCharacterSpeed
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float aimWalkSpeed = 150.f;
+	float aimWalkSpeed = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float simpleWalkSpeed = 300.f;
 
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float aimRunSpeed = 250.f;
+	float aimRunSpeed = 400.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float runSpeed = 500.f;
 
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float fastRunSpeed = 800.f;
+	float acceleration = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float fastRunSpeed = 900.f;
 };
 
 UCLASS()

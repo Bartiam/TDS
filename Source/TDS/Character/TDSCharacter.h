@@ -6,8 +6,17 @@
 #include "GameFramework/Character.h"
 
 #include "../FuncLibrary/Types.h"
+#include "../Weapons/WeaponActor_Base.h"
 
 #include "TDSCharacter.generated.h"
+
+//USTRUCT(BlueprintType)
+//struct FCharacterSpeedInfo
+//{
+//	GENERATED_BODY()
+//
+//
+//};
 
 UCLASS(Blueprintable)
 class ATDSCharacter : public ACharacter
@@ -43,11 +52,11 @@ public:
 
 	// ============================= Cursor =============================
 	UPROPERTY();
-	UDecalComponent* CursorToWorld = nullptr;
+	UDecalComponent* cursorToWorld = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
-	UMaterialInterface* CursorMaterial = nullptr;
+	UMaterialInterface* cursorMaterial = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
-	FVector CursorSize = FVector();
+	FVector cursorSize = FVector();
 
 	// =============== Current state of character =======================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -94,6 +103,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stamina")
 	float timeToRecoverStaminaAfterZero = 2.f;
 
+	//============================== for demo ===============================
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Demo")
+	TSubclassOf<AWeaponActor_Base> initWeaponClass = nullptr;
+
+	// ============================ Public Weapon ===========================
+	UFUNCTION(BlueprintCallable)
+	void InitWeapon(); //ToDo Init by id row by table
 
 private:
 	// ================ Functions for movement character ================
@@ -159,12 +175,19 @@ private:
 	UFUNCTION()
 	void ChangeCanIncreaseStamina();
 
+	// =============================== Weapon ===============================
+	UPROPERTY()
+	AWeaponActor_Base* currentWeapon = nullptr;
+
 public: // ===================== Getters and setters ========================
 
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentStamina() const;
 
-	UFUNCTION()
-	UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+	UFUNCTION(BlueprintCallable)
+	UDecalComponent* GetCursorToWorld() const;
+
+	UFUNCTION(BlueprintCallable)
+	AWeaponActor_Base* GetCurrentWeapon() const;
 };
 

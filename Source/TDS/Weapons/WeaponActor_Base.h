@@ -2,36 +2,67 @@
 
 #pragma once
 
+#pragma once
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/ArrowComponent.h"
 
+#include "../FuncLibrary/Types.h"
+#include "Projectiles/Projectile_Base.h"
 #include "WeaponActor_Base.generated.h"
+
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFireStart);//ToDo Delegate on event weapon fire - Anim char, state char...
 
 UCLASS()
 class TDS_API AWeaponActor_Base : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AWeaponActor_Base();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 	class USceneComponent* sceneComponent = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Components")
-	class USkeletalMeshComponent* SkeletalMeshWeapon = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Components")
-	class UStaticMeshComponent* StaticMeshWeapon = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Components")
-	class UArrowComponent* ShootLocation = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+	class USkeletalMeshComponent* skeletalMeshWeapon = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+	class UStaticMeshComponent* staticMeshWeapon = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+	class UArrowComponent* shootLocation = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
+	FWeaponInfo weaponSetting;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+public:
+	// Tick func
 	virtual void Tick(float DeltaTime) override;
+
+	void FireTick(float DeltaTime);
+
+	void WeaponInit();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
+	bool weaponFiring = false;
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponStateFire(bool bIsFire);
+
+	bool GetWeaponCanFire();
+
+	FProjectileInfo GetProjectile();
+
+	void Fire();
+
+	void UpdateStateWeapon(EMovementState NewMovementState);
+	void ChangeDispersion();
+
+	//Timers'flags
+	float FireTime = 0.0;
 
 };

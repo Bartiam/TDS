@@ -59,15 +59,17 @@ void ATDSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (CursorMaterial)
-		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector());
+	if (cursorMaterial)
+		cursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), cursorMaterial, cursorSize, FVector());
+
+	InitWeapon();
 }
 
 void ATDSCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	if (CursorToWorld)
+	if (cursorToWorld)
 	{
 		if (APlayerController* myPC = Cast<APlayerController>(GetController()))
 		{
@@ -76,8 +78,8 @@ void ATDSCharacter::Tick(float DeltaSeconds)
 			FVector CursorFV = traceHitResult.ImpactNormal;
 			FRotator CursorR = CursorFV.Rotation();
 
-			CursorToWorld->SetWorldLocation(traceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
+			cursorToWorld->SetWorldLocation(traceHitResult.Location);
+			cursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
 
@@ -288,8 +290,39 @@ void ATDSCharacter::AugmentStamina()
 void ATDSCharacter::ChangeCanIncreaseStamina()
 { bIsCanIncreaseStamina = true; }
 
+// =========================================== Weapon =================================================
 
+void ATDSCharacter::InitWeapon() //ToDo Init by id row by table
+{
+	if (initWeaponClass)
+	{
+		FVector SpawnLocation = FVector(0);
+		FRotator SpawnRotation = FRotator(0);
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Owner = GetOwner();
+		SpawnParams.Instigator = GetInstigator();
+
+		AWeaponActor_Base* myWeapon = Cast<AWeaponActor_Base>(GetWorld()->SpawnActor(initWeaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
+		if (myWeapon)
+		{
+			FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
+			myWeapon->AttachToComponent(GetMesh(), Rule, FName("WeaponSocketRightHand"));
+			currentWeapon = myWeapon;
+
+			myWeapon->UpdateStateWeapon(currentStateOfMove);
+		}
+	}
+
+}
 
 // ===================================== Getters and setters ==========================================
 float ATDSCharacter::GetCurrentStamina() const
 { return currentStamina; }
+
+UDecalComponent* ATDSCharacter::GetCursorToWorld() const
+{ return cursorToWorld; }
+
+AWeaponActor_Base* ATDSCharacter::GetCurrentWeapon() const
+{ return currentWeapon; }

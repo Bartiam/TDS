@@ -17,6 +17,9 @@ class ATDSCharacter : public ACharacter
 public:
 	ATDSCharacter();
 
+	// Called once at the beginning of the game
+	virtual void BeginPlay() override;
+
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -26,8 +29,6 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns CursorToWorld subobject **/
-	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
 private:
 	/** Top down camera */
@@ -38,11 +39,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	/** A decal that projects to the cursor location. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UDecalComponent* CursorToWorld;
-
 public:
+
+	// ============================= Cursor =============================
+	UPROPERTY();
+	UDecalComponent* CursorToWorld = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
+	UMaterialInterface* CursorMaterial = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
+	FVector CursorSize = FVector();
 
 	// =============== Current state of character =======================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -158,5 +163,8 @@ public: // ===================== Getters and setters ========================
 
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentStamina() const;
+
+	UFUNCTION()
+	UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 };
 

@@ -45,17 +45,6 @@ ATDSCharacter::ATDSCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Create a decal in the world to show the cursor's location
-	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
-	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Blueprints/Character/M_Cursor_Decal.M_Cursor_Decal'"));
-	if (DecalMaterialAsset.Succeeded())
-	{
-		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
-	}
-	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
-
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -66,33 +55,28 @@ ATDSCharacter::ATDSCharacter()
 	currentStamina = maxStamina;
 }
 
+void ATDSCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (CursorMaterial)
+		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector());
+}
+
 void ATDSCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	if (CursorToWorld != nullptr)
+	if (CursorToWorld)
 	{
-		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
+		if (APlayerController* myPC = Cast<APlayerController>(GetController()))
 		{
-			if (UWorld* World = GetWorld())
-			{
-				FHitResult HitResult;
-				FCollisionQueryParams Params(NAME_None, FCollisionQueryParams::GetUnknownStatId());
-				FVector StartLocation = TopDownCameraComponent->GetComponentLocation();
-				FVector EndLocation = TopDownCameraComponent->GetComponentRotation().Vector() * 2000.0f;
-				Params.AddIgnoredActor(this);
-				World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params);
-				FQuat SurfaceRotation = HitResult.ImpactNormal.ToOrientationRotator().Quaternion();
-				CursorToWorld->SetWorldLocationAndRotation(HitResult.Location, SurfaceRotation);
-			}
-		}
-		else if (APlayerController* PC = Cast<APlayerController>(GetController()))
-		{
-			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
+			FHitResult traceHitResult;
+			myPC->GetHitResultUnderCursor(ECC_Visibility, true, traceHitResult);
+			FVector CursorFV = traceHitResult.ImpactNormal;
 			FRotator CursorR = CursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
+
+			CursorToWorld->SetWorldLocation(traceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
@@ -118,20 +102,8 @@ void ATDSCharacter::InputAxisY(const float value)
 
 void ATDSCharacter::MovementTick(const float deltaTime)
 {
-	if (CursorToWorld != nullptr)
-	{
-		if (APlayerController* PC = Cast<APlayerController>(GetController()))
-		{
-			AddMovementInput(FVector(1.f, 0.f, 0.f), axisX);
-			AddMovementInput(FVector(0.f, 1.f, 0.f), axisY);
-			FHitResult traceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, traceHitResult);
-			FVector cursorFV = traceHitResult.ImpactNormal;
-			FRotator cursorR = cursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(traceHitResult.Location);
-			CursorToWorld->SetWorldRotation(cursorR);
-		}
-	}
+	AddMovementInput(FVector(1.f, 0.f, 0.f), axisX);
+	AddMovementInput(FVector(0.f, 1.f, 0.f), axisY);
 
 	auto myPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -139,7 +111,7 @@ void ATDSCharacter::MovementTick(const float deltaTime)
 		return;
 
 	FHitResult resultHit;
-	myPlayerController->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery6, false, resultHit);
+	myPlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, resultHit);
 
 	if (bIsFastRunning)
 	{

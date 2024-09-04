@@ -9,37 +9,37 @@ AProjectile_Base::AProjectile_Base()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BulletCollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Sphere"));
+	bulletCollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Sphere"));
 
-	BulletCollisionSphere->SetSphereRadius(16.f);
+	bulletCollisionSphere->SetSphereRadius(16.f);
 
-	BulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereHit);
-	BulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereBeginOverlap);
-	BulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereEndOverlap);
+	bulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereHit);
+	bulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereBeginOverlap);
+	bulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereEndOverlap);
 
-	BulletCollisionSphere->bReturnMaterialOnMove = true;//hit event return physMaterial
+	bulletCollisionSphere->bReturnMaterialOnMove = true;//hit event return physMaterial
 
-	BulletCollisionSphere->SetCanEverAffectNavigation(false);//collision not affect navigation (P keybord on editor)
+	bulletCollisionSphere->SetCanEverAffectNavigation(false);//collision not affect navigation (P keybord on editor)
 
-	RootComponent = BulletCollisionSphere;
+	RootComponent = bulletCollisionSphere;
 
-	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bullet Projectile Mesh"));
-	BulletMesh->SetupAttachment(RootComponent);
-	BulletMesh->SetCanEverAffectNavigation(false);
+	bulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bullet Projectile Mesh"));
+	bulletMesh->SetupAttachment(RootComponent);
+	bulletMesh->SetCanEverAffectNavigation(false);
 
-	BulletFX = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Bullet FX"));
-	BulletFX->SetupAttachment(RootComponent);
+	bulletFX = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Bullet FX"));
+	bulletFX->SetupAttachment(RootComponent);
 
 	//BulletSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Bullet Audio"));
 	//BulletSound->SetupAttachment(RootComponent);
 
-	BulletProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Bullet ProjectileMovement"));
-	BulletProjectileMovement->UpdatedComponent = RootComponent;
-	BulletProjectileMovement->InitialSpeed = 1.f;
-	BulletProjectileMovement->MaxSpeed = 0.f;
+	bulletProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Bullet ProjectileMovement"));
+	bulletProjectileMovement->UpdatedComponent = RootComponent;
+	bulletProjectileMovement->InitialSpeed = 1.f;
+	bulletProjectileMovement->MaxSpeed = 0.f;
 
-	BulletProjectileMovement->bRotationFollowsVelocity = true;
-	BulletProjectileMovement->bShouldBounce = true;
+	bulletProjectileMovement->bRotationFollowsVelocity = true;
+	bulletProjectileMovement->bShouldBounce = true;
 
 }
 

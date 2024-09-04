@@ -111,6 +111,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InitWeapon(); //ToDo Init by id row by table
 
+	// ============================= Public fire ============================
+	UFUNCTION(BlueprintCallable)
+	void AttackCharEvent(bool bIsFiring);
+
 private:
 	// ================ Functions for movement character ================
 	UFUNCTION()
@@ -175,9 +179,14 @@ private:
 	UFUNCTION()
 	void ChangeCanIncreaseStamina();
 
-	// =============================== Weapon ===============================
+	// =========================== Weapon private ===========================
 	UPROPERTY()
 	AWeaponActor_Base* currentWeapon = nullptr;
+
+	// ============================ Fire private ============================
+	UFUNCTION()
+	void InputAttackPressed();
+	void InputAttackReleased();
 
 public: // ===================== Getters and setters ========================
 

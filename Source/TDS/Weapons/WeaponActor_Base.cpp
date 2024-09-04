@@ -45,10 +45,10 @@ void AWeaponActor_Base::Tick(float DeltaTime)
 void AWeaponActor_Base::FireTick(float DeltaTime)
 {
 	if (weaponFiring)
-		if (FireTime < 0.f)
+		if (fireTime < 0.f)
 			Fire();
 		else
-			FireTime -= DeltaTime;
+			fireTime -= DeltaTime;
 
 }
 
@@ -67,30 +67,26 @@ void AWeaponActor_Base::WeaponInit()
 
 void AWeaponActor_Base::SetWeaponStateFire(bool bIsFire)
 {
-	if (GetWeaponCanFire())
+	if (CheckWeaponCanFire())
 		weaponFiring = bIsFire;
 	else
 		weaponFiring = false;
 }
 
-bool AWeaponActor_Base::GetWeaponCanFire()
-{
-	return false;
-}
+bool AWeaponActor_Base::CheckWeaponCanFire()
+{ return true; }
 
 FProjectileInfo AWeaponActor_Base::GetProjectile()
-{
-	return FProjectileInfo();
-}
+{ return weaponSetting.projectileSettings; }
 
 void AWeaponActor_Base::Fire()
 {
-	FireTime = weaponSetting.rateOfFire;
+	fireTime = weaponSetting.rateOfFire;
 
 	if (shootLocation)
 	{
-		FVector SpawnLocation = shootLocation->GetComponentLocation();
-		FRotator SpawnRotation = shootLocation->GetComponentRotation();
+		FVector spawnLocation = shootLocation->GetComponentLocation();
+		FRotator spawnRotation = shootLocation->GetComponentRotation();
 		FProjectileInfo ProjectileInfo;
 		ProjectileInfo = GetProjectile();
 
@@ -98,22 +94,22 @@ void AWeaponActor_Base::Fire()
 		{
 			//Projectile Init ballistic fire
 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			SpawnParams.Owner = GetOwner();
-			SpawnParams.Instigator = GetInstigator();
+			FActorSpawnParameters spawnParams;
+			spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			spawnParams.Owner = GetOwner();
+			spawnParams.Instigator = GetInstigator();
 
-			AProjectile_Base* myProjectile = Cast<AProjectile_Base>(GetWorld()->SpawnActor(ProjectileInfo.projectile, &SpawnLocation, &SpawnRotation, SpawnParams));
+			AProjectile_Base* myProjectile = Cast<AProjectile_Base>(GetWorld()->SpawnActor(ProjectileInfo.projectile, &spawnLocation, &spawnRotation, spawnParams));
 			if (myProjectile)
 			{
 				//ToDo Init Projectile settings by id in table row(or keep in weapon table)
-				myProjectile->InitialLifeSpan = 20.0f;
+				myProjectile->InitialLifeSpan = 20.f;
 				//Projectile->BulletProjectileMovement->InitialSpeed = 2500.0f;
 			}
 		}
 		else
 		{
-			//ToDo Projectile null Init trace fire			
+			//ToDo Projectile null Init trace fire
 		}
 	}
 

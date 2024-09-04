@@ -53,7 +53,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponStateFire(bool bIsFire);
 
-	bool GetWeaponCanFire();
+	bool CheckWeaponCanFire();
 
 	FProjectileInfo GetProjectile();
 
@@ -63,6 +63,6 @@ public:
 	void ChangeDispersion();
 
 	//Timers'flags
-	float FireTime = 0.0;
+	float fireTime = 0.f;
 
 };

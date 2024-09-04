@@ -90,9 +90,16 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 {
 	Super::SetupPlayerInputComponent(newInputComponent);
 
+	// Events to movement
 	newInputComponent->BindAxis(TEXT("MoveForward"), this, &ATDSCharacter::InputAxisX);
 	newInputComponent->BindAxis(TEXT("MoveRight"), this, &ATDSCharacter::InputAxisY);
+
+	// Event to camera slide
 	newInputComponent->BindAxis(TEXT("MouseWheel"), this, &ATDSCharacter::MouseWheelCameraSlide);
+
+	// Events to fire
+	newInputComponent->BindAction(TEXT("FireEvent"), EInputEvent::IE_Pressed, this, &ATDSCharacter::InputAttackPressed);
+	newInputComponent->BindAction(TEXT("FireEvent"), EInputEvent::IE_Released, this, &ATDSCharacter::InputAttackReleased);
 }
 
 // ================================ Functions for movement character ================================
@@ -315,6 +322,28 @@ void ATDSCharacter::InitWeapon() //ToDo Init by id row by table
 		}
 	}
 
+}
+
+// ============================================ Fire ==================================================
+
+void ATDSCharacter::InputAttackPressed()
+{ AttackCharEvent(true); }
+
+void ATDSCharacter::InputAttackReleased()
+{ AttackCharEvent(false); }
+
+void ATDSCharacter::AttackCharEvent(bool bIsFiring)
+{
+	AWeaponActor_Base* myWeapon = nullptr;
+	myWeapon = GetCurrentWeapon();
+
+	if (myWeapon)
+	{
+		// ToDo Check melee or range
+		myWeapon->SetWeaponStateFire(bIsFiring);
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("ATDCharacter::AttachCharEvent - CurrentWeapon - NULL"));
 }
 
 // ===================================== Getters and setters ==========================================

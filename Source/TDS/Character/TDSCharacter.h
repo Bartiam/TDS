@@ -194,7 +194,7 @@ public: // ===================== Getters and setters ========================
 	float GetCurrentStamina() const;
 
 	UFUNCTION(BlueprintCallable)
-	UDecalComponent* GetCursorToWorld() const;
+	UDecalComponent* GetCursorToWorld();
 
 	UFUNCTION(BlueprintCallable)
 	AWeaponActor_Base* GetCurrentWeapon() const;

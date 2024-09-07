@@ -187,6 +187,12 @@ void ATDSCharacter::ChangeMovementState()
 		currentStateOfMove = EMovementState::RUN_STATE;
 
 	CharacterUpdateSpeed();
+
+	// Weapon state update
+	AWeaponActor_Base* myWeapon = GetCurrentWeapon();
+
+	if (IsValid(myWeapon))
+		myWeapon->UpdateStateWeapon(currentStateOfMove);
 }
 
 void ATDSCharacter::AccelerationAndDeccelerationToMove()
@@ -350,7 +356,7 @@ void ATDSCharacter::AttackCharEvent(bool bIsFiring)
 float ATDSCharacter::GetCurrentStamina() const
 { return currentStamina; }
 
-UDecalComponent* ATDSCharacter::GetCursorToWorld() const
+UDecalComponent* ATDSCharacter::GetCursorToWorld()
 { return cursorToWorld; }
 
 AWeaponActor_Base* ATDSCharacter::GetCurrentWeapon() const

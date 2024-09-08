@@ -32,8 +32,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 	class UArrowComponent* shootLocation = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
+	UPROPERTY()
 	FWeaponInfo weaponSetting;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon info")
+	FAddicionalWeaponInfo weaponInfo;
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,6 +51,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
 	bool weaponFiring = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
+	bool weaponReloading = false;
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponStateFire(bool bIsFire);

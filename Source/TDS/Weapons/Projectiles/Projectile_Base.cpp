@@ -2,6 +2,8 @@
 
 
 #include "Projectile_Base.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AProjectile_Base::AProjectile_Base()
@@ -12,10 +14,6 @@ AProjectile_Base::AProjectile_Base()
 	bulletCollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Sphere"));
 
 	bulletCollisionSphere->SetSphereRadius(16.f);
-
-	bulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereHit);
-	bulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereBeginOverlap);
-	bulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereEndOverlap);
 
 	bulletCollisionSphere->bReturnMaterialOnMove = true;//hit event return physMaterial
 
@@ -40,13 +38,16 @@ AProjectile_Base::AProjectile_Base()
 
 	bulletProjectileMovement->bRotationFollowsVelocity = true;
 	bulletProjectileMovement->bShouldBounce = true;
-
 }
 
 // Called when the game starts or when spawned
 void AProjectile_Base::BeginPlay()
 {
 	Super::BeginPlay();
+
+	bulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereHit);
+	bulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereBeginOverlap);
+	bulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectile_Base::BulletCollisionSphereEndOverlap);
 }
 
 // Called every frame
@@ -55,8 +56,18 @@ void AProjectile_Base::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AProjectile_Base::InitProjectile(FProjectileInfo initParam)
+{
+	bulletProjectileMovement->InitialSpeed = initParam.projectileInitSpeed;
+	bulletProjectileMovement->MaxSpeed = initParam.projectileInitSpeed;
+	this->SetLifeSpan(initParam.projectileLifeTime);
+
+	projectileSetting = initParam;
+}
+
 void AProjectile_Base::BulletCollisionSphereHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	
 }
 
 void AProjectile_Base::BulletCollisionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -65,4 +76,9 @@ void AProjectile_Base::BulletCollisionSphereBeginOverlap(UPrimitiveComponent* Ov
 
 void AProjectile_Base::BulletCollisionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+}
+
+void AProjectile_Base::ImpactProjectile()
+{
+	this->Destroy();
 }

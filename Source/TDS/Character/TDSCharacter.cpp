@@ -14,6 +14,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "../Game/TDSGameInstance.h"
 
 ATDSCharacter::ATDSCharacter()
 {
@@ -61,8 +62,6 @@ void ATDSCharacter::BeginPlay()
 
 	if (cursorMaterial)
 		cursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), cursorMaterial, cursorSize, FVector());
-
-	InitWeapon();
 }
 
 void ATDSCharacter::Tick(float DeltaSeconds)
@@ -305,9 +304,17 @@ void ATDSCharacter::ChangeCanIncreaseStamina()
 
 // =========================================== Weapon =================================================
 
-void ATDSCharacter::InitWeapon() //ToDo Init by id row by table
+void ATDSCharacter::InitWeapon(FName idWeapon) //ToDo Init by id row by table
 {
-	if (initWeaponClass)
+	UTDSGameInstance* myGameInstance = Cast<UTDSGameInstance>(GetGameInstance());
+	FWeaponInfo myWeaponInfo;
+
+	if (myGameInstance)
+	{
+		myWeaponInfo = myGameInstance->GetWeaponInfoByName(idWeapon);
+	}
+
+	if (myWeaponInfo.weaponClass)
 	{
 		FVector SpawnLocation = FVector(0);
 		FRotator SpawnRotation = FRotator(0);
@@ -317,7 +324,7 @@ void ATDSCharacter::InitWeapon() //ToDo Init by id row by table
 		SpawnParams.Owner = GetOwner();
 		SpawnParams.Instigator = GetInstigator();
 
-		AWeaponActor_Base* myWeapon = Cast<AWeaponActor_Base>(GetWorld()->SpawnActor(initWeaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
+		AWeaponActor_Base* myWeapon = Cast<AWeaponActor_Base>(GetWorld()->SpawnActor(myWeaponInfo.weaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
 		if (myWeapon)
 		{
 			FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);

@@ -20,5 +20,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponSettings")
 	UDataTable* weaponInfoTable = nullptr;
 	UFUNCTION(BlueprintCallable)
-	bool GetWeaponInfoByName(FName nameWeapon, FWeaponInfo& outInfo);
+	bool GetWeaponInfoByName(FName nameWeapon, FWeaponInfo& outInfoWeapon);
 };

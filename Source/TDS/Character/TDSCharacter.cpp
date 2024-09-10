@@ -101,6 +101,8 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* newInputComponent
 	// Events to fire
 	newInputComponent->BindAction(TEXT("FireEvent"), EInputEvent::IE_Pressed, this, &ATDSCharacter::InputAttackPressed);
 	newInputComponent->BindAction(TEXT("FireEvent"), EInputEvent::IE_Released, this, &ATDSCharacter::InputAttackReleased);
+	// Event to reload weapon
+	newInputComponent->BindAction(TEXT("ReloadEvent"), EInputEvent::IE_Released, this, &ATDSCharacter::TryReloadWeapon);
 }
 
 // ================================ Functions for movement character ================================
@@ -334,6 +336,7 @@ void ATDSCharacter::InitWeapon(FName idWeapon) //ToDo Init by id row by table
 
 					myWeapon->SetWeaponSettings(myWeaponInfo);
 					myWeapon->UpdateStateWeapon(currentStateOfMove);
+					myWeapon->reloadTimer = myWeapon->weaponSettings.reloadTime;
 				}
 			}
 		}
@@ -343,6 +346,17 @@ void ATDSCharacter::InitWeapon(FName idWeapon) //ToDo Init by id row by table
 }
 
 // ============================================ Fire ==================================================
+
+void ATDSCharacter::TryReloadWeapon()
+{
+	if (currentWeapon)
+	{
+		if (currentWeapon->GetWeaponRound() < currentWeapon->weaponSettings.maxRound)
+		{
+			currentWeapon->InitReload();
+		}
+	}
+}
 
 void ATDSCharacter::InputAttackPressed()
 { AttackCharEvent(true); }

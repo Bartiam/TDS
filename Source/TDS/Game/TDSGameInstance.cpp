@@ -3,7 +3,7 @@
 
 #include "TDSGameInstance.h"
 
-bool UTDSGameInstance::GetWeaponInfoByName(FName nameWeapon, FWeaponInfo& outInfo)
+bool UTDSGameInstance::GetWeaponInfoByName(FName nameWeapon, FWeaponInfo& outInfoWeapon)
 {
 	bool bIsFind = false;
 	FWeaponInfo* weaponInfoRow = nullptr;
@@ -14,7 +14,7 @@ bool UTDSGameInstance::GetWeaponInfoByName(FName nameWeapon, FWeaponInfo& outInf
 		if (weaponInfoRow)
 		{
 			bIsFind = true;
-			outInfo = *weaponInfoRow;
+			outInfoWeapon = *weaponInfoRow;
 		}
 	}
 

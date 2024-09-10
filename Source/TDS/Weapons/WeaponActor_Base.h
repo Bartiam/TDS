@@ -46,8 +46,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void FireTick(float DeltaTime);
+	void ReloadTick(float DeltaTime);
 
 	void WeaponInit();
+	void InitReload();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
 	bool weaponFiring = false;
@@ -67,9 +69,16 @@ public:
 	void ChangeDispersion();
 
 	//Timers'flags
-	float fireTime = 0.f;
+	float fireTimer = 0.f;
+	float reloadTimer = 0.f;
+
+private:
+	void FinishReload();
 
 public:
 	// ================================= Setters and Getters =================================
 	void SetWeaponSettings(FWeaponInfo newWeaponSettings);
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetWeaponRound();
 };

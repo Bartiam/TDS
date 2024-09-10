@@ -30,7 +30,6 @@ AWeaponActor_Base::AWeaponActor_Base()
 void AWeaponActor_Base::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -39,16 +38,36 @@ void AWeaponActor_Base::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FireTick(DeltaTime);
+	ReloadTick(DeltaTime);
 }
 
 void AWeaponActor_Base::FireTick(float DeltaTime)
 {
 	if (weaponFiring)
-		if (fireTime < 0.f)
-			Fire();
+		if (fireTimer < 0.f)
+		{
+			if (GetWeaponRound() > 0)
+			{
+				if (!weaponReloading)
+					Fire();
+			}
+			else
+			{
+				if (!weaponReloading)
+					InitReload();
+			}
+		}
 		else
-			fireTime -= DeltaTime;
+			fireTimer -= DeltaTime;
+}
 
+void AWeaponActor_Base::ReloadTick(float DeltaTime)
+{
+	if (weaponReloading)
+		if (reloadTimer < 0.f)
+			FinishReload();
+		else
+			reloadTimer -= DeltaTime;
 }
 
 void AWeaponActor_Base::WeaponInit()
@@ -80,7 +99,8 @@ FProjectileInfo AWeaponActor_Base::GetProjectile()
 
 void AWeaponActor_Base::Fire()
 {
-	fireTime = weaponSettings.rateOfFire;
+	fireTimer = weaponSettings.rateOfFire;
+	weaponInfo.round--;
 
 	if (shootLocation)
 	{
@@ -125,6 +145,22 @@ void AWeaponActor_Base::ChangeDispersion()
 
 }
 
+void AWeaponActor_Base::InitReload()
+{
+	weaponReloading = true;
+	// ToDo anim reload
+}
+
+void AWeaponActor_Base::FinishReload()
+{
+	weaponReloading = false;
+	reloadTimer = weaponSettings.reloadTime;
+	weaponInfo.round = weaponSettings.maxRound;
+}
+
 // ================================= Setters and Getters =================================
 void AWeaponActor_Base::SetWeaponSettings(FWeaponInfo newWeaponSettings)
 { weaponSettings = newWeaponSettings; }
+
+int32 AWeaponActor_Base::GetWeaponRound()
+{ return weaponInfo.round; }

@@ -110,6 +110,8 @@ public:
 	// ============================ Public Weapon ===========================
 	UFUNCTION(BlueprintCallable)
 	void InitWeapon(FName idWeapon); //ToDo Init by id row by table
+	UFUNCTION(BlueprintCallable)
+	void TryReloadWeapon();
 
 	// ============================= Public fire ============================
 	UFUNCTION(BlueprintCallable)

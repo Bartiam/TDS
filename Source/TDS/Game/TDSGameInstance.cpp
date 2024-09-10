@@ -3,8 +3,20 @@
 
 #include "TDSGameInstance.h"
 
-FWeaponInfo UTDSGameInstance::GetWeaponInfoByName(FName nameWeapon)
+bool UTDSGameInstance::GetWeaponInfoByName(FName nameWeapon, FWeaponInfo& outInfo)
 {
-	FWeaponInfo weaponInfo;
-	return weaponInfo;
+	bool bIsFind = false;
+	FWeaponInfo* weaponInfoRow = nullptr;
+
+	if (weaponInfoTable)
+	{
+		weaponInfoRow = weaponInfoTable->FindRow<FWeaponInfo>(nameWeapon, "", false);
+		if (weaponInfoRow)
+		{
+			bIsFind = true;
+			outInfo = *weaponInfoRow;
+		}
+	}
+
+	return bIsFind;
 }

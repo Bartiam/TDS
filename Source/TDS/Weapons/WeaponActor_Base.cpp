@@ -30,8 +30,7 @@ AWeaponActor_Base::AWeaponActor_Base()
 void AWeaponActor_Base::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	WeaponInit();
+
 }
 
 // Called every frame
@@ -77,11 +76,11 @@ bool AWeaponActor_Base::CheckWeaponCanFire()
 { return true; }
 
 FProjectileInfo AWeaponActor_Base::GetProjectile()
-{ return weaponSetting.projectileSettings; }
+{ return weaponSettings.projectileSettings; }
 
 void AWeaponActor_Base::Fire()
 {
-	fireTime = weaponSetting.rateOfFire;
+	fireTime = weaponSettings.rateOfFire;
 
 	if (shootLocation)
 	{
@@ -125,3 +124,7 @@ void AWeaponActor_Base::ChangeDispersion()
 {
 
 }
+
+// ================================= Setters and Getters =================================
+void AWeaponActor_Base::SetWeaponSettings(FWeaponInfo newWeaponSettings)
+{ weaponSettings = newWeaponSettings; }

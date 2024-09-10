@@ -105,7 +105,7 @@ public:
 
 	//============================== for demo ===============================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Demo")
-	TSubclassOf<AWeaponActor_Base> initWeaponClass = nullptr;
+	FName initWeaponName;
 
 	// ============================ Public Weapon ===========================
 	UFUNCTION(BlueprintCallable)

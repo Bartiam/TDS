@@ -62,6 +62,8 @@ void ATDSCharacter::BeginPlay()
 
 	if (cursorMaterial)
 		cursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), cursorMaterial, cursorSize, FVector());
+
+	InitWeapon(initWeaponName);
 }
 
 void ATDSCharacter::Tick(float DeltaSeconds)
@@ -311,30 +313,33 @@ void ATDSCharacter::InitWeapon(FName idWeapon) //ToDo Init by id row by table
 
 	if (myGameInstance)
 	{
-		myWeaponInfo = myGameInstance->GetWeaponInfoByName(idWeapon);
-	}
-
-	if (myWeaponInfo.weaponClass)
-	{
-		FVector SpawnLocation = FVector(0);
-		FRotator SpawnRotation = FRotator(0);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Owner = GetOwner();
-		SpawnParams.Instigator = GetInstigator();
-
-		AWeaponActor_Base* myWeapon = Cast<AWeaponActor_Base>(GetWorld()->SpawnActor(myWeaponInfo.weaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
-		if (myWeapon)
+		if (myGameInstance->GetWeaponInfoByName(idWeapon, myWeaponInfo))
 		{
-			FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
-			myWeapon->AttachToComponent(GetMesh(), Rule, FName("WeaponSocketRightHand"));
-			currentWeapon = myWeapon;
+			if (myWeaponInfo.weaponClass)
+			{
+				FVector SpawnLocation = FVector(0);
+				FRotator SpawnRotation = FRotator(0);
 
-			myWeapon->UpdateStateWeapon(currentStateOfMove);
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				SpawnParams.Owner = GetOwner();
+				SpawnParams.Instigator = GetInstigator();
+
+				AWeaponActor_Base* myWeapon = Cast<AWeaponActor_Base>(GetWorld()->SpawnActor(myWeaponInfo.weaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
+				if (myWeapon)
+				{
+					FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
+					myWeapon->AttachToComponent(GetMesh(), Rule, FName("WeaponSocketRightHand"));
+					currentWeapon = myWeapon;
+
+					myWeapon->SetWeaponSettings(myWeaponInfo);
+					myWeapon->UpdateStateWeapon(currentStateOfMove);
+				}
+			}
 		}
+		else
+			UE_LOG(LogTemp, Warning, TEXT("InitWeapon = ERROR! - Weapon nor found in table. "));
 	}
-
 }
 
 // ============================================ Fire ==================================================

@@ -33,7 +33,7 @@ public:
 	class UArrowComponent* shootLocation = nullptr;
 
 	UPROPERTY()
-	FWeaponInfo weaponSetting;
+	FWeaponInfo weaponSettings;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon info")
 	FAddicionalWeaponInfo weaponInfo;
 
@@ -69,4 +69,7 @@ public:
 	//Timers'flags
 	float fireTime = 0.f;
 
+public:
+	// ================================= Setters and Getters =================================
+	void SetWeaponSettings(FWeaponInfo newWeaponSettings);
 };
